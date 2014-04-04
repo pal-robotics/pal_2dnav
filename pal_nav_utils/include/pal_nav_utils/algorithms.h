@@ -32,7 +32,7 @@
 namespace pal
 {
 
-namespace exploration
+namespace nav
 {
 
   static const int64_t UNREACHABLE = 1e12;
@@ -127,7 +127,7 @@ namespace exploration
     return distance < UNREACHABLE - 0.5;
   }
 
-}  // namespace exploration
+}  // namespace nav
 }  // namespace pal
 
 #endif  // PAL_NAV_UTILS_FRONTIERS_STRATEGY_H_

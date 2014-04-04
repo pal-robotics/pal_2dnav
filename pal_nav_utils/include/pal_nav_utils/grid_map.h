@@ -40,7 +40,7 @@
 namespace pal
 {
 
-namespace exploration
+namespace nav
 {
 
   class GridMap : public Grid
@@ -183,7 +183,7 @@ namespace exploration
   GridMask* makeSquareMask(int radius);
   GridMask* makeCircularMask(int radius, int8_t value=GridMap::DANGER, int8_t default_value=GridMap::UNKNOWN);
 
-}  // namespace exploration
+}  // namespace nav
 }  // namespace pal
 
 #endif  // PAL_NAV_UTILS_GRID_MAP_

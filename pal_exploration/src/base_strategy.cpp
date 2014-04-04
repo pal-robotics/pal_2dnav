@@ -29,6 +29,8 @@
 #include <pal_nav_utils/visualization.h>
 #include "pal_exploration/visualization.h"
 
+using namespace pal::nav;
+
 namespace pal
 {
 

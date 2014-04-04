@@ -86,15 +86,15 @@ namespace exploration
     T incr_;
   };
 
-  inline NumericRangeIterator<index_t> iterateGridMapRow(const GridMap& map, uint32_t row)
+  inline NumericRangeIterator<nav::index_t> iterateGridMapRow(const nav::GridMap& map, uint32_t row)
   {
-    index_t start = row * map.width;
-    return NumericRangeIterator<index_t>(start, start + map.width, 1);
+    nav::index_t start = row * map.width;
+    return NumericRangeIterator<nav::index_t>(start, start + map.width, 1);
   }
 
-  inline NumericRangeIterator<index_t> iterateGridMapColumn(const GridMap& map, uint32_t col)
+  inline NumericRangeIterator<nav::index_t> iterateGridMapColumn(const nav::GridMap& map, uint32_t col)
   {
-    return NumericRangeIterator<index_t>(0, map.size() - (map.width - col), map.width);
+    return NumericRangeIterator<nav::index_t>(0, map.size() - (map.width - col), map.width);
   }
 
 }  // namespace exploration

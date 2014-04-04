@@ -34,7 +34,7 @@
 namespace pal
 {
 
-namespace exploration
+namespace nav
 {
 
   nav_msgs::OccupancyGrid createOccupancyGrid(const GridMap& map);
@@ -67,7 +67,7 @@ namespace exploration
     return std::to_string(number);
   }
 
-}  // namespace exploration
+}  // namespace nav
 }  // namespace pal
 
 #endif  // PAL_NAV_UTILS_VISUALIZATION_

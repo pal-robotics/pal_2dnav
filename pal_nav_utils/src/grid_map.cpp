@@ -30,7 +30,7 @@
 namespace pal
 {
 
-namespace exploration
+namespace nav
 {
 
   const int8_t GridMap::OBSTACLE = 100;
@@ -195,5 +195,5 @@ namespace exploration
     return !danger;
   }
 
-}  // namespace exploration
+}  // namespace nav
 }  // namespace pal

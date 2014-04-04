@@ -27,7 +27,7 @@
 namespace pal
 {
 
-namespace exploration
+namespace nav
 {
 
   void Markers::setDefaultColor(float r, float g, float b, float a)
@@ -121,5 +121,5 @@ namespace exploration
     }
   }
 
-}  // namespace exploration
+}  // namespace nav
 }  // namespace pal

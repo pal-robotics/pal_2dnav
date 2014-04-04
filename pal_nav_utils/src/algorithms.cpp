@@ -30,7 +30,7 @@
 namespace pal
 {
 
-namespace exploration
+namespace nav
 {
 
   DistanceStruct dijkstra(
@@ -114,5 +114,5 @@ namespace exploration
     }
   }
 
-}  // namespace exploration
+}  // namespace nav
 }  // namespace pal

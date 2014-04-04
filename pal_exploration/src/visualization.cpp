@@ -28,6 +28,8 @@
 
 #include "pal_exploration/frontiers.h"
 
+using namespace pal::nav;
+
 namespace pal
 {
 

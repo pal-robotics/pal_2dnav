@@ -28,7 +28,7 @@
 namespace pal
 {
 
-namespace exploration
+namespace nav
 {
 
   indices_t Grid::getFourNeighbours(index_t idx) const
@@ -69,5 +69,5 @@ namespace exploration
     return neighbours;
   }
 
-}  // namespace exploration
+}  // namespace nav
 }  // namespace pal

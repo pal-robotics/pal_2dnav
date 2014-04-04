@@ -39,6 +39,8 @@
 #include "pal_exploration/frontiers_strategy.h"
 #include "pal_exploration/visualization.h"
 
+using namespace pal::nav;
+
 namespace pal
 {
 

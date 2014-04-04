@@ -34,7 +34,7 @@
 namespace pal
 {
 
-namespace exploration
+namespace nav
 {
 
   class Markers
@@ -81,7 +81,7 @@ namespace exploration
     std::map<std::string, Markers> markers_;
   };
 
-}  // namespace exploration
+}  // namespace nav
 }  // namespace pal
 
 #endif  // PAL_NAV_UTILS_MARKERS_

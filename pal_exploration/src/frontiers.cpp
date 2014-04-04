@@ -24,6 +24,8 @@
 
 #include <queue>
 
+using namespace pal::nav;
+
 namespace pal
 {
 

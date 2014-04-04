@@ -33,7 +33,7 @@
 namespace pal
 {
 
-namespace exploration
+namespace nav
 {
 
   typedef int32_t index_t;
@@ -89,7 +89,7 @@ namespace exploration
   // A mask/kernel to use for convolution, etc.
   typedef Grid GridMask;
 
-}  // namespace exploration
+}  // namespace nav
 }  // namespace pal
 
 #endif  // PAL_NAV_UTILS_GRID_

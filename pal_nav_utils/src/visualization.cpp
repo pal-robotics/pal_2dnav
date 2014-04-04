@@ -29,7 +29,7 @@
 namespace pal
 {
 
-namespace exploration
+namespace nav
 {
 
   nav_msgs::OccupancyGrid createOccupancyGrid(const GridMap& map)
@@ -123,5 +123,5 @@ namespace exploration
     return pose_array;
   }
 
-}  // namespace exploration
+}  // namespace nav
 }  // namespace pal
