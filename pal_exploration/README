@@ -5,6 +5,9 @@ HOW TO RUN EXPLORATION
  Then send an empty goal to start the action, eg. using axclient:
   $ rosrun actionlib axclient.py /exploration_server
 
+ ... or using axcli:
+  $ axcli /exploration_server "{}"
+
 
 HOW TO SAVE A KARTO TRAJECTORY
 

@@ -1,41 +1,36 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/../catkin/cmake/debug_message.cmake)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+cmake_minimum_required(VERSION 2.8.3)
+project(pal_exploration)
 
-# Set the build type.  Options are:
-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
-#  Debug          : w/ debug symbols, w/o optimization
-#  Release        : w/o debug symbols, w/ optimization
-#  RelWithDebInfo : w/ debug symbols, w/ optimization
-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-set(ROS_BUILD_TYPE RelWithDebInfo)
+set(ROS_DEPS actionlib dynamic_reconfigure geometry_msgs move_base_msgs pcl_conversions roscpp sensor_msgs std_msgs tf visualization_msgs)
+
+find_package(catkin REQUIRED COMPONENTS ${ROS_DEPS})
+find_package(Boost REQUIRED)
+find_package(PCL REQUIRED)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 
-rosbuild_find_ros_package(actionlib_msgs)
-include(${actionlib_msgs_PACKAGE_PATH}/cmake/actionbuild.cmake)
-genaction()
+add_action_files(DIRECTORY action FILES Exploration.action)
+generate_messages(DEPENDENCIES actionlib_msgs)
 
-rosbuild_init()
+generate_dynamic_reconfigure_options(cfg/PalExploration.cfg)
 
-find_package(PCL REQUIRED)
+include_directories(include ${catkin_INCLUDE_DIRS} ${PCL_INCLUDE_DIRS})
 
-include_directories(include ${PCL_INCLUDE_DIRS})
-
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
-
-rosbuild_add_boost_directories()
-
-rosbuild_genmsg()
-
-#add dynamic reconfigure api
-rosbuild_find_ros_package(dynamic_reconfigure)
-include(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
-gencfg()
+catkin_package()
 
 # Header files are included so that they'll show up in QtCreator
-rosbuild_add_library(pal_exploration src/base_strategy.cpp src/frontiers_strategy.cpp include/${PROJECT_NAME}/base_strategy.h include/${PROJECT_NAME}/frontiers_strategy.h src/grid.cpp include/${PROJECT_NAME}/grid.h src/grid_map.cpp include/${PROJECT_NAME}/grid_map.h include/${PROJECT_NAME}/visualization.h include/${PROJECT_NAME}/frontiers.h include/${PROJECT_NAME}/algorithms.h src/visualization.cpp src/algorithms.cpp src/markers.cpp include/${PROJECT_NAME}/markers.h src/frontiers.cpp)
+add_library(${PROJECT_NAME} src/base_strategy.cpp src/frontiers_strategy.cpp include/${PROJECT_NAME}/base_strategy.h include/${PROJECT_NAME}/frontiers_strategy.h src/grid.cpp include/${PROJECT_NAME}/grid.h src/grid_map.cpp include/${PROJECT_NAME}/grid_map.h include/${PROJECT_NAME}/visualization.h include/${PROJECT_NAME}/frontiers.h include/${PROJECT_NAME}/algorithms.h src/visualization.cpp src/algorithms.cpp src/markers.cpp include/${PROJECT_NAME}/markers.h src/frontiers.cpp)
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencfg ${PROJECT_NAME}_generate_messages_cpp)
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
-rosbuild_add_executable(exploration_server src/exploration_server.cpp)
-target_link_libraries(exploration_server ${PROJECT_NAME})
+add_executable(exploration_server src/exploration_server.cpp)
+add_dependencies(exploration_server ${PROJECT_NAME}_gencfg ${PROJECT_NAME}_generate_messages_cpp)
+target_link_libraries(exploration_server ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${PROJECT_NAME})
+
+install(TARGETS exploration_server
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+foreach(dir launch config)
+    install(DIRECTORY ${dir}/
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})
+endforeach(dir)
