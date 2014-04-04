@@ -1,7 +1,7 @@
 <package>
 
-  <name>pal_exploration</name>
-  <description>Autonomous exploration module</description>
+  <name>pal_nav_utils</name>
+  <description>Utility methods for navigation-related software</description>
   <version>0.1.0</version>
   <maintainer email="siegfried.gevatter@pal-robotics.com">Siegfried-A. Gevatter Pujals</maintainer>
   <author>Siegfried-A. Gevatter Pujals</author>
@@ -10,10 +10,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>actionlib</build_depend>
-  <build_depend>dynamic_reconfigure</build_depend>
   <build_depend>geometry_msgs</build_depend>
-  <build_depend>move_base_msgs</build_depend>
-  <build_depend>pal_nav_utils</build_depend>
   <build_depend>pcl_conversions</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>sensor_msgs</build_depend>
@@ -22,10 +19,7 @@
   <build_depend>visualization_msgs</build_depend>
 
   <run_depend>actionlib</run_depend>
-  <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>geometry_msgs</run_depend>
-  <run_depend>move_base_msgs</run_depend>
-  <run_depend>pal_nav_utils</run_depend>
   <run_depend>pcl_conversions</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>sensor_msgs</run_depend>
