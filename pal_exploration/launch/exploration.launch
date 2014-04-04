@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="pal_exploration" type="exploration_server" name="exploration_server" output="screen">
+    <remap from="map" to="vo_map"/>
+  </node>
+</launch>
