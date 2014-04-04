@@ -23,6 +23,7 @@
 #ifndef PAL_NAV_UTILS_ALGORITHMS_H_
 #define PAL_NAV_UTILS_ALGORITHMS_H_
 
+#include <functional>
 #include <vector>
 
 #include <tf/transform_datatypes.h>
@@ -62,8 +63,6 @@ namespace nav
 
   void apply_mask_at_idx(GridMap& map, const GridMask& mask, ApplyMaskOperator op, index_t idx);
   void apply_mask_if(GridMap& map, const GridMask& mask, ApplyMaskOperator op, GridCellSelectorFunction pred);
-
-
 
   inline bool isReachable(double distance)
   {

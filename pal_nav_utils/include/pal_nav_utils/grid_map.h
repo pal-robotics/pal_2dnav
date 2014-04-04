@@ -47,6 +47,12 @@ namespace nav
   {
   public:
 
+    GridMap(int width, int height, double resolution, const geometry_msgs::Pose& origin)
+      : Grid(width, height),
+        resolution(resolution), origin(origin)
+    {
+    }
+
     GridMap(const nav_msgs::OccupancyGrid& map)
       : Grid(map.data, map.info.width, map.info.height),
         resolution(map.info.resolution), origin(map.info.origin)
@@ -57,8 +63,8 @@ namespace nav
 
     inline index_t getIdxForPosition(const tf::Point& point) const
     {
-      int x = (point.x() - origin.position.x) / resolution;
-      int y = (point.y() - origin.position.y) / resolution;
+      int x = coordToX(point.x());
+      int y = coordToY(point.y());
       return getIdx(x, y);
     }
 
@@ -69,9 +75,19 @@ namespace nav
 
     inline tf::Vector3 getPositionFromIdx(index_t idx) const
     {
-      double x = (idx % width) * resolution + origin.position.x;
-      double y = (idx / width) * resolution + origin.position.y;
+      double x = xToCoord(idx % width);
+      double y = yToCoord(idx / width);
       return tf::Vector3(x, y, 0);
+    }
+
+    inline int coordToX(double x) const
+    {
+      return (x - origin.position.x) / resolution;
+    }
+
+    inline int coordToY(double y) const
+    {
+      return (y - origin.position.y) / resolution;
     }
 
     inline double xToCoord(int x) const
@@ -174,13 +190,13 @@ namespace nav
     geometry_msgs::Pose origin;
   };
 
-  void inflateObstacles(GridMap& map, int radius);
+  void inflateObstacles(GridMap& map, int radius, int8_t value=GridMap::DANGER);
   void freeRobotPose(GridMap& map, index_t idx, int radius);
   void inflateBlacklist(GridMap& map, std::set<tf::Vector3> positions, int radius);
 
   bool isRadiusFree(GridMap& map, index_t idx, int radius);
 
-  GridMask* makeSquareMask(int radius);
+  GridMask* makeSquareMask(int radius, int8_t value=GridMap::DANGER);
   GridMask* makeCircularMask(int radius, int8_t value=GridMap::DANGER, int8_t default_value=GridMap::UNKNOWN);
 
 }  // namespace nav

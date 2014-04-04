@@ -66,11 +66,11 @@ namespace nav
     return v / c;
   }
 
-  GridMask* makeSquareMask(int radius)
+  GridMask* makeSquareMask(int radius, int8_t value)
   {
     const int mask_w = (2 * radius + 1);
     const int mask_h = (2 * radius + 1);
-    std::vector<int8_t> mask(mask_w * mask_h, GridMap::DANGER);
+    std::vector<int8_t> mask(mask_w * mask_h, value);
     return new GridMask(mask, mask_w, mask_h);
   }
 
@@ -96,7 +96,7 @@ namespace nav
 
 #define CHECK_RADIUS(r) if (radius == 0) return; ROS_ASSERT(radius > 0);
 
-  void inflateObstacles(GridMap& map, int radius)
+  void inflateObstacles(GridMap& map, int radius, int8_t value)
   {
     CHECK_RADIUS(radius);
 
@@ -105,7 +105,7 @@ namespace nav
     if (!grid_mask || radius != last_radius)
     {
       delete grid_mask;
-      grid_mask = makeCircularMask(radius);
+      grid_mask = makeCircularMask(radius, value);
       last_radius = radius;
     }
 

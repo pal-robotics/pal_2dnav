@@ -42,6 +42,10 @@ namespace nav
   class Grid
   {
   public:
+    Grid(int width, int height)
+      : data(width*height), width(width), height(height)
+    {}
+
     Grid(const std::vector<int8_t>& data, int width, int height)
       : data(data), width(width), height(height)
     {}
