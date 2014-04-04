@@ -63,64 +63,7 @@ namespace nav
   void apply_mask_at_idx(GridMap& map, const GridMask& mask, ApplyMaskOperator op, index_t idx);
   void apply_mask_if(GridMap& map, const GridMask& mask, ApplyMaskOperator op, GridCellSelectorFunction pred);
 
-  typedef std::function<bool(const GridMap&, index_t)> RayTraceOp;
 
-  /*
-   * An implementation of Bresenham's Line Algorithm.
-   */
-  inline bool raytrace(const GridMap& map, index_t startIdx, index_t endIdx, RayTraceOp op)
-  {
-    const auto _s = map.getPositionFromIdx(startIdx);
-    const int sx = _s.x();
-    const int sy = _s.y();
-
-    const auto _e = map.getPositionFromIdx(endIdx);
-    const int ex = _e.x();
-    const int ey = _e.y();
-
-    const int dx = abs(ex - ey);
-    const int dy = abs(ey - sy);
-
-    const int stepX = (sx < ex) ? 1 : -1;
-    const int stepY = (sy < ey) ? 1 : -1;
-
-    int x = sx;
-    int y = sy;
-    int err = dx - dy;
-
-    ROS_WARN_STREAM("ray in -- " << startIdx << " " << endIdx);
-    while (true)
-    {
-      int idx = map.getIdxForPosition(tf::Vector3(x, y, 0));
-      ROS_WARN_STREAM("it " << idx << " " << x << " " << y << " for " << (endIdx % map.width) << " " << (endIdx / map.width));
-      if (idx == endIdx) return true;
-      if (idx == -1 || !op(map, idx))
-        return false;
-      if (x == ex && y == ey) break;
-      int e2 = 2 * err;
-      if (e2 > -dy)
-      {
-        err -= dy;
-        x += stepX;
-      }
-      if (x == ex && y == ey)
-      {
-        ROS_WARN("ray check");
-        int idx = map.getIdxForPosition(tf::Vector3(x, y, 0));
-        if (idx == endIdx) return true;
-        if (idx == -1 || !op(map, idx))
-          return false;
-        break;
-      }
-      if (e2 < dx) {
-        err += dx;
-        y += stepY;
-      }
-    }
-    ROS_WARN("ray out");
-
-    return true;
-  }
 
   inline bool isReachable(double distance)
   {
