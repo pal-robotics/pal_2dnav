@@ -24,6 +24,7 @@ add_library(${PROJECT_NAME}
   src/visualization.cpp include/${PROJECT_NAME}/visualization.h
   src/algorithms.cpp include/${PROJECT_NAME}/algorithms.h
   src/markers.cpp include/${PROJECT_NAME}/markers.h
+  include/${PROJECT_NAME}/conversions.h
 )
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
