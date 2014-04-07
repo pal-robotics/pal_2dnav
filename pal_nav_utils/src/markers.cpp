@@ -30,6 +30,13 @@ namespace pal
 namespace nav
 {
 
+  void Markers::setDefaultScale(float x, float y, float z)
+  {
+    scale_x_ = x;
+    scale_y_ = y;
+    scale_z_ = z;
+  }
+
   void Markers::setDefaultColor(float r, float g, float b, float a)
   {
     color_r_ = r;
@@ -53,9 +60,9 @@ namespace nav
     marker.pose.position.y = position.y();
     marker.pose.position.z = 0;
 
-    marker.scale.x = 0.2;
-    marker.scale.y = 0.2;
-    marker.scale.z = 0.2;
+    marker.scale.x = scale_x_;
+    marker.scale.y = scale_y_;
+    marker.scale.z = scale_z_;
 
     marker.color.r = color_r_;
     marker.color.g = color_g_;

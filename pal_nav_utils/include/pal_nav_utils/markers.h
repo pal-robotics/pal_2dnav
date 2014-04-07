@@ -42,8 +42,10 @@ namespace nav
   public:
     Markers(ros::Publisher& pub, const std::string& ns)
       : publisher_(pub), ns_(ns), last_num_markers_(0),
-        color_r_(0), color_g_(0), color_b_(0), color_a_(1.0) {}
+        color_r_(0), color_g_(0), color_b_(0), color_a_(1.0),
+        scale_x_(0.2), scale_y_(0.2), scale_z_(0.2) {}
 
+    void setDefaultScale(float x, float y, float z);
     void setDefaultColor(float r, float g, float b, float a);
 
     visualization_msgs::Marker& addMarker(const tf::Point &position);
@@ -62,6 +64,10 @@ namespace nav
     float color_g_;
     float color_b_;
     float color_a_;
+
+    float scale_x_;
+    float scale_y_;
+    float scale_z_;
   };
 
   class MarkersCollection
