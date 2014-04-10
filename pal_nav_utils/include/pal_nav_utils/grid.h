@@ -58,6 +58,22 @@ namespace nav
     }
 
     /*
+     * Same as data[getIdxNoBounds(x, y)].
+     */
+    inline index_t cell(int x, int y) const
+    {
+      return data[getIdxNoBounds(x, y)];
+    }
+
+    /*
+     * Converts a cell position expressed as (x, y) into an index.
+     */
+    inline index_t getIdxNoBounds(int x, int y) const
+    {
+      return x + y * width;
+    }
+
+    /*
      * Converts a cell position expressed as (x, y) into an index.
      *
      * If the position is invalid, returns -1.
