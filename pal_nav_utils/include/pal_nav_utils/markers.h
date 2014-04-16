@@ -48,7 +48,10 @@ namespace nav
     void setDefaultScale(float x, float y, float z);
     void setDefaultColor(float r, float g, float b, float a);
 
-    visualization_msgs::Marker& addMarker(const tf::Point &position);
+    visualization_msgs::Marker& addMarker(const tf::Point& position);
+    visualization_msgs::Marker& addMarker(
+        const tf::Point& position,
+        const tf::Quaternion& orientation);
 
     visualization_msgs::Marker& addTextMarker(const std::string& text, const tf::Point& position);
 

@@ -73,6 +73,13 @@ namespace nav
     return marker_array_.markers.back();
   }
 
+  visualization_msgs::Marker& Markers::addMarker(const tf::Point& position, const tf::Quaternion& orientation)
+  {
+    visualization_msgs::Marker& marker = addMarker(position);
+    tf::quaternionTFToMsg(orientation, marker.pose.orientation);
+    return marker;
+  }
+
   visualization_msgs::Marker& Markers::addTextMarker(const std::string& text, const tf::Point& position)
   {
     visualization_msgs::Marker& marker = addMarker(position);
