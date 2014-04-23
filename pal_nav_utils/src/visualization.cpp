@@ -20,6 +20,8 @@
  *
  *************************************************************************/
 
+#include <algorithm>
+
 #include "pal_nav_utils/visualization.h"
 
 #include <pcl/point_types.h>
@@ -57,18 +59,19 @@ namespace nav
     return createOccupancyGrid(tmp);
   }
 
-  sensor_msgs::PointCloud2 createPointCloud(const GridMap& map, const std::vector<float>& cells)
+  sensor_msgs::PointCloud2 createPointCloud(const GridMap& map, const std::vector<float>& cells, float height_scale)
   {
     pcl::PointCloud<pcl::PointXYZI> cloud;
 
     cloud.width = map.width;
     cloud.height = map.height;
     cloud.points.resize(map.size());
+    float max_value = *std::max_element(cells.begin(), cells.end());
     for (index_t idx = 0; idx < map.size(); ++idx)
     {
       cloud.points[idx].x = map.xToCoord(idx % map.width);
       cloud.points[idx].y = map.yToCoord(idx / map.width);
-      cloud.points[idx].z = cells[idx] / 30.0;
+      cloud.points[idx].z = (std::fabs(max_value) > 1e-6) ? (cells[idx] / max_value) * height_scale : 0;
       cloud.points[idx].intensity = cells[idx];
     }
 
@@ -82,10 +85,10 @@ namespace nav
   }
 
 
-  sensor_msgs::PointCloud2 createPointCloud(const GridMap& map, const std::vector<int8_t>& cells)
+  sensor_msgs::PointCloud2 createPointCloud(const GridMap& map, const std::vector<int8_t>& cells, float height_scale)
   {
     std::vector<float> tmp(cells.begin(), cells.end());
-    return createPointCloud(map, tmp);
+    return createPointCloud(map, tmp, height_scale);
   }
 
   /*

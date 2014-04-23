@@ -41,8 +41,8 @@ namespace nav
 
   nav_msgs::OccupancyGrid createOccupancyGrid(const GridMap& map, const std::vector<int8_t>& cells);
 
-  sensor_msgs::PointCloud2 createPointCloud(const GridMap& map, const std::vector<float>& cells);
-  sensor_msgs::PointCloud2 createPointCloud(const GridMap& map, const std::vector<int8_t>& cells);
+  sensor_msgs::PointCloud2 createPointCloud(const GridMap& map, const std::vector<float>& cells, float height_scale=3.0);
+  sensor_msgs::PointCloud2 createPointCloud(const GridMap& map, const std::vector<int8_t>& cells, float height_scale=3.0);
 
   /*
    * Creates a PoseArray with arrows in each cell showing which paths
