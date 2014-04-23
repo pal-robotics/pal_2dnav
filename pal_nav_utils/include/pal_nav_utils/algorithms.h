@@ -58,11 +58,16 @@ namespace nav
       IndicesFunction getEdges, CostFunction getCost);
 
 
-  typedef std::function<bool(const GridMap&, index_t)> GridCellSelectorFunction;
+  typedef std::function<bool(const Grid&, index_t)> GridCellSelectorFunction;
   typedef std::function<int8_t(int8_t, int8_t)> ApplyMaskOperator;
 
-  void apply_mask_at_idx(GridMap& map, const GridMask& mask, ApplyMaskOperator op, index_t idx);
-  void apply_mask_if(GridMap& map, const GridMask& mask, ApplyMaskOperator op, GridCellSelectorFunction pred);
+  void apply_mask_at_idx(Grid& map, const GridMask& mask, ApplyMaskOperator op, index_t idx);
+  void apply_mask_if(Grid& map, const GridMask& mask, ApplyMaskOperator op, GridCellSelectorFunction pred);
+
+  inline int8_t MaskOperatorMax(int8_t cell, int8_t mask_cell)
+  {
+    return std::max(cell, mask_cell);
+  }
 
   inline bool isReachable(double distance)
   {

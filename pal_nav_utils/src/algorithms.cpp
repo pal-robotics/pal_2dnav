@@ -71,7 +71,7 @@ namespace nav
     return DistanceStruct(targetIdx, distmap, prevmap);
   }
 
-  void apply_mask_at_idx(GridMap& map, const GridMask& mask, ApplyMaskOperator op, index_t idx)
+  void apply_mask_at_idx(Grid& map, const GridMask& mask, ApplyMaskOperator op, index_t idx)
   {
     // Otherwise we can't calculate the center point
     ROS_ASSERT(mask.width % 2 == 1);
@@ -114,7 +114,7 @@ namespace nav
     }
   }
 
-  void apply_mask_if(GridMap& map, const GridMask& mask, ApplyMaskOperator op, GridCellSelectorFunction pred)
+  void apply_mask_if(Grid& map, const GridMask& mask, ApplyMaskOperator op, GridCellSelectorFunction pred)
   {
     for (index_t idx = 0; idx < map.size(); ++idx)
     {

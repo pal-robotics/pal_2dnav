@@ -114,7 +114,7 @@ namespace nav
       return std::max(cell, mask_cell);
     };
 
-    GridCellSelectorFunction pred = boost::bind(&GridMap::isObstacle, _1, _2);
+    GridCellSelectorFunction pred = boost::bind(&GridMap::isObstacle, map, _2);
 
     apply_mask_if(map, *grid_mask, op, pred);
   }
