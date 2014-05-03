@@ -35,7 +35,7 @@ target_link_libraries(exploration_server ${catkin_LIBRARIES} ${Boost_LIBRARIES} 
 install(TARGETS exploration_server
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-foreach(dir launch config)
+foreach(dir launch)
     install(DIRECTORY ${dir}/
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})
 endforeach(dir)
