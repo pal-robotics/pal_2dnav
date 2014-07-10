@@ -42,11 +42,13 @@ namespace nav
   class Grid
   {
   public:
+    typedef int8_t value_type;
+
     Grid(int width, int height)
       : data(width*height), width(width), height(height)
     {}
 
-    Grid(const std::vector<int8_t>& data, int width, int height)
+    Grid(const std::vector<value_type>& data, int width, int height)
       : data(data), width(width), height(height)
     {}
 
@@ -60,7 +62,7 @@ namespace nav
     /*
      * Same as data[getIdx(x, y)].
      */
-    inline index_t cell(int x, int y) const
+    inline value_type cell(int x, int y) const
     {
       return data[getIdx(x, y)];
     }
@@ -90,7 +92,7 @@ namespace nav
 
     indices_t getEightNeighbours(index_t idx) const;
 
-    std::vector<int8_t> data;
+    std::vector<value_type> data;
     int width;
     int height;
   };
