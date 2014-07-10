@@ -71,59 +71,5 @@ namespace nav
     return DistanceStruct(targetIdx, distmap, prevmap);
   }
 
-  void apply_mask_at_idx(Grid& map, const GridMask& mask, ApplyMaskOperator op, index_t idx)
-  {
-    // Otherwise we can't calculate the center point
-    ROS_ASSERT(mask.width % 2 == 1);
-    ROS_ASSERT(mask.height % 2 == 1);
-
-    int anchor_x = mask.width / 2;  // = std::ceil(max.width / 2) - 1
-    int anchor_y = mask.height / 2;
-
-    const int x = idx % map.width;
-    const int y = idx / map.width;
-
-    // Calculate y range (checking mask and map boundaries)
-    int start_cy = y - anchor_y;
-    int start_i = 0;
-    if (start_cy < 0)
-    {
-      start_i = -start_cy;
-      start_cy = 0;
-    }
-    int height = std::min(mask.height - start_i, map.height - start_cy);
-
-    // Calculate x range (checking mask and map boundaries)
-    int start_cx = x - anchor_x;
-    int start_j = 0;
-    if (start_cx < 0)
-    {
-      start_j = -start_cx;
-      start_cx = 0;
-    }
-    int width = std::min(mask.width - start_j, map.width - start_cx);
-
-    for (int i = start_i, cy = start_cy; i < height; ++i, ++cy)
-    {
-      for (int j = start_j, cx = start_cx; j < width; ++j, ++cx)
-      {
-        const int cidx = cy * map.width + cx;
-        const int mask_idx = i * mask.width + j;
-        map.data[cidx] = op(map.data[cidx], mask.data[mask_idx]);
-      }
-    }
-  }
-
-  void apply_mask_if(Grid& map, const GridMask& mask, ApplyMaskOperator op, GridCellSelectorFunction pred)
-  {
-    for (index_t idx = 0; idx < map.size(); ++idx)
-    {
-      if (pred(map, idx))
-      {
-        apply_mask_at_idx(map, mask, op, idx);
-      }
-    }
-  }
-
 }  // namespace nav
 }  // namespace pal

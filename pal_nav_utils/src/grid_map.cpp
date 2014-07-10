@@ -66,46 +66,20 @@ namespace nav
     return v / c;
   }
 
-  GridMask* makeSquareMask(int radius, int8_t value)
-  {
-    const int mask_w = (2 * radius + 1);
-    const int mask_h = (2 * radius + 1);
-    std::vector<int8_t> mask(mask_w * mask_h, value);
-    return new GridMask(mask, mask_w, mask_h);
-  }
-
-  GridMask* makeCircularMask(int radius, int8_t value, int8_t default_value)
-  {
-    // The +1 is required so that the resulting size is odd (and
-    // thus it has a center cell, required by apply_mask_if).
-    const int mask_w = (2 * radius + 1);
-    const int mask_h = (2 * radius + 1);
-    std::vector<int8_t> mask(mask_w * mask_h, default_value);
-    for (int y = 0; y < mask_h; ++y)
-    {
-      for (int x = 0; x < mask_w; ++x)
-      {
-        if (pow(x - radius, 2) + pow(y - radius, 2) <= pow(radius, 2))
-        {
-          mask[x + y * mask_w] = value;
-        }
-      }
-    }
-    return new GridMask(mask, mask_w, mask_h);
-  }
-
 #define CHECK_RADIUS(r) if (radius == 0) return; ROS_ASSERT(radius > 0);
 
   void inflateObstacles(GridMap& map, int radius, int8_t value)
   {
     CHECK_RADIUS(radius);
 
-    static GridMask* grid_mask = NULL;
+    typedef GridMap::value_type value_type;
+
+    static GridMask<value_type>::type* grid_mask = NULL;
     static int last_radius = -1;
     if (!grid_mask || radius != last_radius)
     {
       delete grid_mask;
-      grid_mask = makeCircularMask(radius, value);
+      grid_mask = makeCircularMask<value_type>(radius, value);
       last_radius = radius;
     }
 
@@ -114,7 +88,7 @@ namespace nav
       return std::max(cell, mask_cell);
     };
 
-    GridCellSelectorFunction pred = boost::bind(&GridMap::isObstacle, map, _2);
+    GridCellSelectorFunction<value_type>::type pred = boost::bind(&GridMap::isObstacle, map, _2);
 
     apply_mask_if(map, *grid_mask, op, pred);
   }
@@ -123,12 +97,14 @@ namespace nav
   {
     CHECK_RADIUS(radius);
 
-    static GridMask* grid_mask = NULL;
+    typedef GridMap::value_type value_type;
+
+    static GridMask<value_type>::type* grid_mask = NULL;
     static int last_radius = -1;
     if (!grid_mask || radius != last_radius)
     {
       delete grid_mask;
-      grid_mask = makeCircularMask(radius);
+      grid_mask = makeCircularMask<value_type>(radius);
       last_radius = radius;
     }
 
@@ -144,12 +120,14 @@ namespace nav
   {
     CHECK_RADIUS(radius);
 
-    static GridMask* grid_mask = NULL;
+    typedef GridMap::value_type value_type;
+
+    static GridMask<value_type>::type* grid_mask = NULL;
     static int last_radius = -1;
     if (!grid_mask || radius != last_radius)
     {
       delete grid_mask;
-      grid_mask = makeCircularMask(radius);
+      grid_mask = makeCircularMask<value_type>(radius);
       last_radius = radius;
     }
 
@@ -172,12 +150,14 @@ namespace nav
 
   bool isRadiusFree(GridMap& map, index_t idx, int radius)
   {
-    static GridMask* grid_mask = NULL;
+    typedef GridMap::value_type value_type;
+
+    static GridMask<value_type>::type* grid_mask = NULL;
     static int last_radius = -1;
     if (!grid_mask || radius != last_radius)
     {
       delete grid_mask;
-      grid_mask = makeCircularMask(radius);
+      grid_mask = makeCircularMask<value_type>(radius);
       last_radius = radius;
     }
 

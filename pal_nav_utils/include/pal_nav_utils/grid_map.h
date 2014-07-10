@@ -43,7 +43,7 @@ namespace pal
 namespace nav
 {
 
-  class GridMap : public Grid
+  class GridMap : public Grid<int8_t>
   {
   public:
 
@@ -196,8 +196,35 @@ namespace nav
 
   bool isRadiusFree(GridMap& map, index_t idx, int radius);
 
-  GridMask* makeSquareMask(int radius, int8_t value=GridMap::DANGER);
-  GridMask* makeCircularMask(int radius, int8_t value=GridMap::DANGER, int8_t default_value=GridMap::UNKNOWN);
+  template <typename T>
+  typename GridMask<T>::type* makeSquareMask(int radius, int8_t value=GridMap::DANGER)
+  {
+    const int mask_w = (2 * radius + 1);
+    const int mask_h = (2 * radius + 1);
+    std::vector<int8_t> mask(mask_w * mask_h, value);
+    return new typename GridMask<T>::type(mask, mask_w, mask_h);
+  }
+
+  template <typename T>
+  typename GridMask<T>::type* makeCircularMask(int radius, int8_t value=GridMap::DANGER, int8_t default_value=GridMap::UNKNOWN)
+  {
+    // The +1 is required so that the resulting size is odd (and
+    // thus it has a center cell, required by apply_mask_if).
+    const int mask_w = (2 * radius + 1);
+    const int mask_h = (2 * radius + 1);
+    std::vector<int8_t> mask(mask_w * mask_h, default_value);
+    for (int y = 0; y < mask_h; ++y)
+    {
+      for (int x = 0; x < mask_w; ++x)
+      {
+        if (pow(x - radius, 2) + pow(y - radius, 2) <= pow(radius, 2))
+        {
+          mask[x + y * mask_w] = value;
+        }
+      }
+    }
+    return new typename GridMask<T>::type(mask, mask_w, mask_h);
+  }
 
 }  // namespace nav
 }  // namespace pal

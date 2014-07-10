@@ -24,7 +24,10 @@
 #define PAL_NAV_UTILS_ALGORITHMS_H_
 
 #include <functional>
+#include <utility>
 #include <vector>
+#include <queue>
+#include <limits>
 
 #include <tf/transform_datatypes.h>
 
@@ -36,7 +39,7 @@ namespace pal
 namespace nav
 {
 
-  static const int64_t UNREACHABLE = 1e12;
+  static const int64_t UNREACHABLE = std::numeric_limits<int64_t>::max();
 
   typedef std::function<indices_t(index_t)> IndicesFunction;
   typedef std::function<double(index_t, index_t)> CostFunction;
@@ -57,12 +60,68 @@ namespace nav
       const GridMap& map, index_t targetIdx,
       IndicesFunction getEdges, CostFunction getCost);
 
-
-  typedef std::function<bool(const Grid&, index_t)> GridCellSelectorFunction;
+  template <typename T>
+  struct GridCellSelectorFunction
+  {
+    typedef std::function<bool(const Grid<T>&, index_t)> type;
+  };
   typedef std::function<int8_t(int8_t, int8_t)> ApplyMaskOperator;
 
-  void apply_mask_at_idx(Grid& map, const GridMask& mask, ApplyMaskOperator op, index_t idx);
-  void apply_mask_if(Grid& map, const GridMask& mask, ApplyMaskOperator op, GridCellSelectorFunction pred);
+  template <typename T>
+  void apply_mask_at_idx(Grid<T>& map, const typename GridMask<T>::type& mask, ApplyMaskOperator op, index_t idx)
+  {
+    // Otherwise we can't calculate the center point
+    ROS_ASSERT(mask.width % 2 == 1);
+    ROS_ASSERT(mask.height % 2 == 1);
+
+    int anchor_x = mask.width / 2;  // = std::ceil(max.width / 2) - 1
+    int anchor_y = mask.height / 2;
+
+    const int x = idx % map.width;
+    const int y = idx / map.width;
+
+    // Calculate y range (checking mask and map boundaries)
+    int start_cy = y - anchor_y;
+    int start_i = 0;
+    if (start_cy < 0)
+    {
+      start_i = -start_cy;
+      start_cy = 0;
+    }
+    int height = std::min(mask.height - start_i, map.height - start_cy);
+
+    // Calculate x range (checking mask and map boundaries)
+    int start_cx = x - anchor_x;
+    int start_j = 0;
+    if (start_cx < 0)
+    {
+      start_j = -start_cx;
+      start_cx = 0;
+    }
+    int width = std::min(mask.width - start_j, map.width - start_cx);
+
+    for (int i = start_i, cy = start_cy; i < height; ++i, ++cy)
+    {
+      for (int j = start_j, cx = start_cx; j < width; ++j, ++cx)
+      {
+        const int cidx = cy * map.width + cx;
+        const int mask_idx = i * mask.width + j;
+        map.data[cidx] = op(map.data[cidx], mask.data[mask_idx]);
+      }
+    }
+  }
+
+  template <typename T>
+  void apply_mask_if(Grid<T>& map, const typename GridMask<T>::type& mask, ApplyMaskOperator op, typename GridCellSelectorFunction<T>::type pred)
+  {
+    for (index_t idx = 0; idx < map.size(); ++idx)
+    {
+      if (pred(map, idx))
+      {
+        apply_mask_at_idx(map, mask, op, idx);
+      }
+    }
+  }
 
   inline int8_t MaskOperatorMax(int8_t cell, int8_t mask_cell)
   {
@@ -77,4 +136,4 @@ namespace nav
 }  // namespace nav
 }  // namespace pal
 
-#endif  // PAL_NAV_UTILS_FRONTIERS_STRATEGY_H_
+#endif  // PAL_NAV_UTILS_ALGORITHMS_H_
