@@ -35,7 +35,7 @@
 #include <tf/transform_datatypes.h>
 #include <pcl_conversions/pcl_conversions.h>
 
-#include "pal_nav_utils/grid.h"
+#include <pal_nav_utils/grid.h>
 
 namespace pal
 {

@@ -20,7 +20,7 @@
  *
  *************************************************************************/
 
-#include "pal_nav_utils/grid.h"
+#include <pal_nav_utils/grid.h>
 
 #include <queue>
 #include <utility>

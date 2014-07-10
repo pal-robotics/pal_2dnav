@@ -29,7 +29,7 @@
 #include <geometry_msgs/PoseArray.h>
 #include <sensor_msgs/PointCloud2.h>
 
-#include "pal_nav_utils/grid_map.h"
+#include <pal_nav_utils/grid_map.h>
 
 namespace pal
 {

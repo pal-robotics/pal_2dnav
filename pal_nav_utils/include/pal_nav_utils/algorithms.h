@@ -28,7 +28,7 @@
 
 #include <tf/transform_datatypes.h>
 
-#include "pal_nav_utils/grid_map.h"
+#include <pal_nav_utils/grid_map.h>
 
 namespace pal
 {
