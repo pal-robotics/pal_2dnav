@@ -46,6 +46,30 @@ namespace nav
 {
 
   template <typename T>
+  class GridLabel
+  {
+  public:
+    typedef T value_type;
+
+    static constexpr value_type OBSTACLE    = value_type(100);
+    static constexpr value_type DANGER      = value_type( 60);
+    static constexpr value_type UNREACHABLE = value_type( 50);
+    static constexpr value_type UNKNOWN     = value_type( -1);
+  };
+
+  template <>
+  class GridLabel<uint8_t>
+  {
+  public:
+    typedef uint8_t value_type;
+
+    static constexpr value_type OBSTACLE    = 100;
+    static constexpr value_type DANGER      =  60;
+    static constexpr value_type UNREACHABLE =  50;
+    static constexpr value_type UNKNOWN     =   0;
+  };
+
+  template <typename T>
   class GridMap : public Grid<T>
   {
   public:
@@ -217,10 +241,10 @@ namespace nav
       return 1;
     }
 
-    static constexpr value_type OBSTACLE = 100;
-    static constexpr value_type DANGER = 60;
-    static constexpr value_type UNREACHABLE = 50;
-    static constexpr value_type UNKNOWN = -1;
+    static constexpr value_type OBSTACLE    = GridLabel<value_type>::OBSTACLE;
+    static constexpr value_type DANGER      = GridLabel<value_type>::OBSTACLE;
+    static constexpr value_type UNREACHABLE = GridLabel<value_type>::UNREACHABLE;
+    static constexpr value_type UNKNOWN     = GridLabel<value_type>::UNKNOWN;
 
     double resolution;
     geometry_msgs::Pose origin;
