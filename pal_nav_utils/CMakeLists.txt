@@ -20,11 +20,11 @@ catkin_package(
 # Header files are included so that they'll show up in QtCreator
 add_library(${PROJECT_NAME}
   include/${PROJECT_NAME}/grid.h
-  src/grid_map.cpp include/${PROJECT_NAME}/grid_map.h
-  src/visualization.cpp include/${PROJECT_NAME}/visualization.h
-  src/algorithms.cpp include/${PROJECT_NAME}/algorithms.h
-  src/markers.cpp include/${PROJECT_NAME}/markers.h
+  include/${PROJECT_NAME}/grid_map.h
+  include/${PROJECT_NAME}/visualization.h
+  include/${PROJECT_NAME}/algorithms.h
   include/${PROJECT_NAME}/conversions.h
+  src/markers.cpp include/${PROJECT_NAME}/markers.h
 )
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 

@@ -37,7 +37,7 @@ namespace exploration
 {
 
   class Frontier;
-  sensor_msgs::PointCloud2 createPointCloud(const nav::GridMap& map, const std::vector<Frontier>& frontiers);
+  sensor_msgs::PointCloud2 createPointCloud(const nav::GridMap<int8_t>& map, const std::vector<Frontier>& frontiers);
 
 }  // namespace exploration
 }  // namespace pal

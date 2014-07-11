@@ -70,7 +70,7 @@ namespace exploration
     return bestIdx;
   }
 
-  index_t Frontier::getGoal(const GridMap &map, const DistanceMap& distmap) const
+  index_t Frontier::getGoal(const GridMap<int8_t>& map, const DistanceMap& distmap) const
   {
     index_t centroid = getCentroidFrontierCell();
 

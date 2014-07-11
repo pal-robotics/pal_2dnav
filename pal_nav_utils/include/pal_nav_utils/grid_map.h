@@ -27,6 +27,7 @@
 #include <cmath>
 #include <vector>
 #include <stack>
+#include <utility>
 
 #include <ros/ros.h>
 #include <ros/assert.h>
@@ -36,6 +37,7 @@
 #include <pcl_conversions/pcl_conversions.h>
 
 #include <pal_nav_utils/grid.h>
+#include <pal_nav_utils/algorithms.h>
 
 namespace pal
 {
@@ -43,18 +45,21 @@ namespace pal
 namespace nav
 {
 
-  class GridMap : public Grid<int8_t>
+  template <typename T>
+  class GridMap : public Grid<T>
   {
   public:
 
+    typedef typename Grid<T>::value_type value_type;
+
     GridMap(int width, int height, double resolution, const geometry_msgs::Pose& origin)
-      : Grid(width, height),
+      : Grid<T>(width, height),
         resolution(resolution), origin(origin)
     {
     }
 
     GridMap(const nav_msgs::OccupancyGrid& map)
-      : Grid(map.data, map.info.width, map.info.height),
+      : Grid<T>(map.data, map.info.width, map.info.height),
         resolution(map.info.resolution), origin(map.info.origin)
     {
     }
@@ -65,7 +70,7 @@ namespace nav
     {
       int x = coordToX(point.x());
       int y = coordToY(point.y());
-      return getIdx(x, y);
+      return this->getIdx(x, y);
     }
 
     inline index_t getIdxForPosition(const geometry_msgs::Point& point) const
@@ -75,8 +80,8 @@ namespace nav
 
     inline tf::Vector3 getPositionFromIdx(index_t idx) const
     {
-      double x = xToCoord(idx % width);
-      double y = yToCoord(idx / width);
+      double x = xToCoord(idx % this->width);
+      double y = yToCoord(idx / this->width);
       return tf::Vector3(x, y, 0);
     }
 
@@ -102,27 +107,27 @@ namespace nav
 
     inline double euclideanDistance(index_t idx1, index_t idx2) const
     {
-      const int x1 = idx1 / width;
-      const int y1 = idx1 % width;
+      const int x1 = idx1 / this->width;
+      const int y1 = idx1 % this->width;
 
-      const int x2 = idx2 / width;
-      const int y2 = idx2 % width;
+      const int x2 = idx2 / this->width;
+      const int y2 = idx2 % this->width;
 
       return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2)) * resolution;
     }
 
     inline bool isObstacle(index_t idx) const {
-      ROS_ASSERT(idx >= 0 && idx < size());
-      return data[idx] >= OBSTACLE;
+      ROS_ASSERT(idx >= 0 && idx < this->size());
+      return this->data[idx] >= OBSTACLE;
     }
 
     inline bool isDanger(index_t idx) const {
-      ROS_ASSERT(idx >= 0 && idx < size());
-      return data[idx] >= DANGER;
+      ROS_ASSERT(idx >= 0 && idx < this->size());
+      return this->data[idx] >= DANGER;
     }
 
     inline bool isUnknown(index_t idx) const {
-      return data[idx] == UNKNOWN;
+      return this->data[idx] == UNKNOWN;
     }
 
     /*
@@ -131,23 +136,49 @@ namespace nav
      *  - is at the map boundary.
      */
     inline bool isFrontier(index_t idx) const {
-      if (data[idx] == UNKNOWN) return false;
+      if (this->data[idx] == UNKNOWN) return false;
 
       // FIXME change to 8-neighbours?
-      for (index_t nidx : getFourNeighbours(idx))
+      for (index_t nidx : this->getFourNeighbours(idx))
       {
         if (isUnknown(nidx)) return true;
       }
 
-      const int x = idx % width;
-      const int y = idx / width;
-      const bool is_on_map_edge = x == 0 || x == width - 1 || y == 0 || y == height - 1;
+      const int x = idx % this->width;
+      const int y = idx / this->width;
+      const bool is_on_map_edge = x == 0 || x == this->width - 1 || y == 0 || y == this->height - 1;
       if (is_on_map_edge) return true;
 
       return false;
     }
 
-    tf::Vector3 getFrontierOrientation(index_t idx) const;
+    tf::Vector3 getFrontierOrientation(index_t idx) const
+    {
+      const tf::Vector3 kRight(1, 0, 0);
+      const tf::Vector3 kLeft(-1, 0, 0);
+      const tf::Vector3 kUp(0, 1, 0);
+      const tf::Vector3 kDown(0, -1, 0);
+
+      int c = 0;
+      tf::Vector3 v(0, 0, 0);
+      auto add = [&c, &v](tf::Vector3 a) { v += a; ++c; };
+
+      // 8-connectivity?
+      if (idx - 1 >= 0 && this->data[idx - 1] == UNKNOWN) add(kLeft);
+      if (idx + 1 < this->size() && this->data[idx + 1] == UNKNOWN) add(kRight);
+      if (idx + this->width < this->size() && this->data[idx + this->width] == UNKNOWN) add(kUp);
+      if (idx - this->width >= 0 && this->data[idx - this->width] == UNKNOWN) add(kDown);
+
+      const int x = idx % this->width;
+      const int y = idx / this->width;
+      if (x == 0) add(kLeft);
+      if (x == this->width - 1) add(kRight);
+      if (y == 0) add(kUp);
+      if (y == this->height - 1) add(kDown);
+
+      ROS_ASSERT(c > 0);
+      return v / c;
+    }
 
     /**
      * @brief Checks whether the cells in a square space are known.
@@ -164,55 +195,44 @@ namespace nav
       const int r = std::floor(R / 2);
       for (int x = cx - r; x <= cx + r; ++x)
       {
-        if (x < 0 || x >= width)
+        if (x < 0 || x >= this->width)
         {
           return -1;
         }
         for (int y = cy - r; y <= cy + r; ++y)
         {
-          if (y < 0 || y >= height)
+          if (y < 0 || y >= this->height)
           {
             return -1;
           }
-          if (data[getIdx(x, y)] == UNKNOWN)
+          if (this->data[this->getIdx(x, y)] == UNKNOWN)
             return 0;
         }
       }
       return 1;
     }
 
-    static const int8_t OBSTACLE;
-    static const int8_t DANGER;
-    static const int8_t UNREACHABLE;
-    static const int8_t UNKNOWN;
+    static constexpr value_type OBSTACLE = 100;
+    static constexpr value_type DANGER = 60;
+    static constexpr value_type UNREACHABLE = 50;
+    static constexpr value_type UNKNOWN = -1;
 
     double resolution;
     geometry_msgs::Pose origin;
   };
 
-  void inflateObstacles(GridMap& map, int radius, int8_t value=GridMap::DANGER);
-  void freeRobotPose(GridMap& map, index_t idx, int radius);
-  void inflateBlacklist(GridMap& map, std::set<tf::Vector3> positions, int radius);
-
-  bool isRadiusFree(GridMap& map, index_t idx, int radius);
+#define CHECK_RADIUS(r) if (radius == 0) return; ROS_ASSERT(radius > 0);
 
   template <typename T>
-  typename GridMask<T>::type* makeSquareMask(int radius, int8_t value=GridMap::DANGER)
+  typename GridMask<T>::type* makeCircularMask(int radius, typename GridMap<T>::value_type value = GridMap<T>::DANGER, typename GridMap<T>::value_type default_value = GridMap<T>::UNKNOWN)
   {
-    const int mask_w = (2 * radius + 1);
-    const int mask_h = (2 * radius + 1);
-    std::vector<int8_t> mask(mask_w * mask_h, value);
-    return new typename GridMask<T>::type(mask, mask_w, mask_h);
-  }
+    typedef typename GridMap<T>::value_type value_type;
 
-  template <typename T>
-  typename GridMask<T>::type* makeCircularMask(int radius, int8_t value=GridMap::DANGER, int8_t default_value=GridMap::UNKNOWN)
-  {
     // The +1 is required so that the resulting size is odd (and
     // thus it has a center cell, required by apply_mask_if).
     const int mask_w = (2 * radius + 1);
     const int mask_h = (2 * radius + 1);
-    std::vector<int8_t> mask(mask_w * mask_h, default_value);
+    std::vector<value_type> mask(mask_w * mask_h, default_value);
     for (int y = 0; y < mask_h; ++y)
     {
       for (int x = 0; x < mask_w; ++x)
@@ -223,6 +243,128 @@ namespace nav
         }
       }
     }
+    return new typename GridMask<T>::type(mask, mask_w, mask_h);
+  }
+
+  template <typename T>
+  void inflateObstacles(GridMap<T>& map, int radius, typename GridMap<T>::value_type value = GridMap<T>::DANGER)
+  {
+    CHECK_RADIUS(radius);
+
+    typedef typename GridMap<T>::value_type value_type;
+
+    static typename GridMask<value_type>::type* grid_mask = NULL;
+    static int last_radius = -1;
+    if (!grid_mask || radius != last_radius)
+    {
+      delete grid_mask;
+      grid_mask = makeCircularMask<value_type>(radius, value);
+      last_radius = radius;
+    }
+
+    typename ApplyMaskOperator<T>::type op = [](value_type cell, value_type mask_cell)
+    {
+      return std::max(cell, mask_cell);
+    };
+
+    typename GridCellSelectorFunction<value_type>::type pred = boost::bind(&GridMap<T>::isObstacle, map, _2);
+
+    apply_mask_if(map, *grid_mask, op, pred);
+  }
+
+  template <typename T>
+  void freeRobotPose(GridMap<T>& map, index_t idx, int radius)
+  {
+    CHECK_RADIUS(radius);
+
+    typedef typename GridMap<T>::value_type value_type;
+
+    static typename GridMask<value_type>::type* grid_mask = NULL;
+    static int last_radius = -1;
+    if (!grid_mask || radius != last_radius)
+    {
+      delete grid_mask;
+      grid_mask = makeCircularMask<value_type>(radius);
+      last_radius = radius;
+    }
+
+    typename ApplyMaskOperator<T>::type op = [](value_type cell, value_type mask_cell)
+    {
+      // Mark the cell as known & free
+      return 0;
+    };
+    apply_mask_at_idx(map, *grid_mask, op, idx);
+  }
+
+  template <typename T>
+  void inflateBlacklist(GridMap<T>& map, std::set<tf::Vector3> positions, int radius)
+  {
+    CHECK_RADIUS(radius);
+
+    typedef typename GridMap<T>::value_type value_type;
+
+    static typename GridMask<value_type>::type* grid_mask = NULL;
+    static int last_radius = -1;
+    if (!grid_mask || radius != last_radius)
+    {
+      delete grid_mask;
+      grid_mask = makeCircularMask<value_type>(radius);
+      last_radius = radius;
+    }
+
+    typename ApplyMaskOperator<T>::type op = [](value_type cell, value_type mask_cell) -> value_type
+    {
+      // If the cell isn't unknown, set it as unreachable.
+      if (cell == GridMap<T>::UNKNOWN)
+        return cell;
+      else
+        return std::max(cell, mask_cell);
+    };
+
+    for (tf::Vector3 pos : positions)
+    {
+      index_t idx = map.getIdxForPosition(pos);
+      ROS_WARN_STREAM("Applying mask at idx=" << idx);
+      apply_mask_at_idx(map, *grid_mask, op, idx);
+    }
+  }
+
+  template <typename T>
+  bool isRadiusFree(GridMap<T>& map, index_t idx, int radius)
+  {
+    typedef typename GridMap<T>::value_type value_type;
+
+    static typename GridMask<value_type>::type* grid_mask = NULL;
+    static int last_radius = -1;
+    if (!grid_mask || radius != last_radius)
+    {
+      delete grid_mask;
+      grid_mask = makeCircularMask<value_type>(radius);
+      last_radius = radius;
+    }
+
+    bool danger = false;
+    typename ApplyMaskOperator<T>::type op = [&danger](value_type cell, value_type mask_cell)
+    {
+      if (mask_cell && cell > 0)
+      {
+        danger = true;
+      }
+      return cell;
+    };
+    apply_mask_at_idx(map, *grid_mask, op, idx);
+
+    return !danger;
+  }
+
+  template <typename T>
+  typename GridMask<T>::type* makeSquareMask(int radius, typename GridMap<T>::value_type value = GridMap<T>::DANGER)
+  {
+    typedef typename GridMap<T>::value_type value_type;
+
+    const int mask_w = (2 * radius + 1);
+    const int mask_h = (2 * radius + 1);
+    std::vector<value_type> mask(mask_w * mask_h, value);
     return new typename GridMask<T>::type(mask, mask_w, mask_h);
   }
 

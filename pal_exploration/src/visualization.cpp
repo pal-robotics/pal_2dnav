@@ -20,13 +20,13 @@
  *
  *************************************************************************/
 
-#include "pal_exploration/visualization.h"
+#include <pal_exploration/visualization.h>
 
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <pcl/ros/conversions.h>
 
-#include "pal_exploration/frontiers.h"
+#include <pal_exploration/frontiers.h>
 
 using namespace pal::nav;
 
@@ -36,7 +36,7 @@ namespace pal
 namespace exploration
 {
 
-  sensor_msgs::PointCloud2 createPointCloud(const GridMap& map, const std::vector<Frontier>& frontiers)
+  sensor_msgs::PointCloud2 createPointCloud(const GridMap<int8_t>& map, const std::vector<Frontier>& frontiers)
   {
     pcl::PointCloud<pcl::PointXYZRGB> cloud;
 

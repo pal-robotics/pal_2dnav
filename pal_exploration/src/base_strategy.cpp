@@ -80,7 +80,7 @@ namespace exploration
 
     ros::WallTime startTime = ros::WallTime::now();
     ROS_INFO_STREAM("Received new map. Processing data... (safety radius = " << safety_radius_ << ")");
-    GridMap* map = new GridMap(slam_map);
+    GridMap<int8_t>* map = new GridMap<int8_t>(slam_map);
 
     const int Rinflate = std::ceil(safety_radius_ / map->resolution);
     inflateObstacles(*map, Rinflate);
