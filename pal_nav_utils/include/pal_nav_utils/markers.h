@@ -53,7 +53,8 @@ namespace nav
         const tf::Point& position,
         const tf::Quaternion& orientation);
 
-    visualization_msgs::Marker& addTextMarker(const std::string& text, const tf::Point& position);
+    visualization_msgs::Marker& addTextMarker(const std::string& text,
+        const tf::Point& position);
 
     void publish(void);
 

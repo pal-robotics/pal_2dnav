@@ -62,7 +62,8 @@ namespace nav
   }
 
   template <typename T>
-  nav_msgs::OccupancyGrid createOccupancyGrid(const GridMap<T>& map, const std::vector<T>& cells)
+  nav_msgs::OccupancyGrid createOccupancyGrid(const GridMap<T>& map,
+      const std::vector<T>& cells)
   {
     GridMap<T> tmp(map);
     tmp.data = cells;
@@ -70,7 +71,9 @@ namespace nav
    }
 
   template <typename T>
-  sensor_msgs::PointCloud2 createPointCloud(const GridMap<T>& map, const std::vector<float>& cells, float height_scale=3.0)
+  sensor_msgs::PointCloud2 createPointCloud(const GridMap<T>& map,
+      const std::vector<float>& cells,
+      float height_scale = 3.0)
   {
     pcl::PointCloud<pcl::PointXYZI> cloud;
 
@@ -82,7 +85,8 @@ namespace nav
     {
       cloud.points[idx].x = map.xToCoord(idx % map.width);
       cloud.points[idx].y = map.yToCoord(idx / map.width);
-      cloud.points[idx].z = (std::fabs(max_value) > 1e-6) ? (cells[idx] / max_value) * height_scale : 0;
+      cloud.points[idx].z = (std::fabs(max_value) > 1e-6) ?
+                            (cells[idx] / max_value) * height_scale : 0;
       cloud.points[idx].intensity = cells[idx];
     }
 
@@ -96,7 +100,9 @@ namespace nav
    }
 
   template <typename T>
-  sensor_msgs::PointCloud2 createPointCloud(const GridMap<T>& map, const std::vector<T>& cells, float height_scale=3.0)
+  sensor_msgs::PointCloud2 createPointCloud(const GridMap<T>& map,
+      const std::vector<T>& cells,
+      float height_scale = 3.0)
   {
     std::vector<float> tmp(cells.begin(), cells.end());
     return createPointCloud(map, tmp, height_scale);
@@ -110,7 +116,8 @@ namespace nav
    *          the previous node for the path loading to idx.
    */
   template <typename T>
-  geometry_msgs::PoseArray createPoseArray(const GridMap<T>& map, const std::vector<index_t>& prevmap)
+  geometry_msgs::PoseArray createPoseArray(const GridMap<T>& map,
+      const std::vector<index_t>& prevmap)
   {
     geometry_msgs::PoseArray pose_array;
 

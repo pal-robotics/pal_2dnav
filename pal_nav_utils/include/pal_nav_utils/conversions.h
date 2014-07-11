@@ -68,7 +68,8 @@ inline geometry_msgs::Pose makePose(double x, double y, double z, double yaw)
   return p;
 }
 
-inline geometry_msgs::Pose makePose(const geometry_msgs::Point& point, double yaw)
+inline geometry_msgs::Pose makePose(
+    const geometry_msgs::Point& point, double yaw)
 {
   geometry_msgs::Pose p;
   p.position = point;
@@ -76,7 +77,9 @@ inline geometry_msgs::Pose makePose(const geometry_msgs::Point& point, double ya
   return p;
 }
 
-inline geometry_msgs::Pose makePose(const geometry_msgs::Point& point, const geometry_msgs::Quaternion& q)
+inline geometry_msgs::Pose makePose(
+    const geometry_msgs::Point& point,
+    const geometry_msgs::Quaternion& q)
 {
   geometry_msgs::Pose p;
   p.position = point;

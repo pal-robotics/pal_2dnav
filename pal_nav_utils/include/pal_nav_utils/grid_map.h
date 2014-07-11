@@ -52,7 +52,8 @@ namespace nav
 
     typedef typename Grid<T>::value_type value_type;
 
-    GridMap(int width, int height, double resolution, const geometry_msgs::Pose& origin)
+    GridMap(int width, int height, double resolution,
+        const geometry_msgs::Pose& origin)
       : Grid<T>(width, height),
         resolution(resolution), origin(origin)
     {
@@ -146,10 +147,10 @@ namespace nav
 
       const int x = idx % this->width;
       const int y = idx / this->width;
-      const bool is_on_map_edge = x == 0 || x == this->width - 1 || y == 0 || y == this->height - 1;
-      if (is_on_map_edge) return true;
+      const bool is_on_map_edge = x == 0 || x == this->width - 1 ||
+                                  y == 0 || y == this->height - 1;
 
-      return false;
+      return is_on_map_edge;
     }
 
     tf::Vector3 getFrontierOrientation(index_t idx) const
@@ -164,10 +165,14 @@ namespace nav
       auto add = [&c, &v](tf::Vector3 a) { v += a; ++c; };
 
       // 8-connectivity?
-      if (idx - 1 >= 0 && this->data[idx - 1] == UNKNOWN) add(kLeft);
-      if (idx + 1 < this->size() && this->data[idx + 1] == UNKNOWN) add(kRight);
-      if (idx + this->width < this->size() && this->data[idx + this->width] == UNKNOWN) add(kUp);
-      if (idx - this->width >= 0 && this->data[idx - this->width] == UNKNOWN) add(kDown);
+      if (idx - 1 >= 0 &&
+          this->data[idx - 1] == UNKNOWN) add(kLeft);
+      if (idx + 1 < this->size() &&
+          this->data[idx + 1] == UNKNOWN) add(kRight);
+      if (idx + this->width < this->size() &&
+          this->data[idx + this->width] == UNKNOWN) add(kUp);
+      if (idx - this->width >= 0 &&
+          this->data[idx - this->width] == UNKNOWN) add(kDown);
 
       const int x = idx % this->width;
       const int y = idx / this->width;
@@ -224,7 +229,9 @@ namespace nav
 #define CHECK_RADIUS(r) if (radius == 0) return; ROS_ASSERT(radius > 0);
 
   template <typename T>
-  typename GridMask<T>::type* makeCircularMask(int radius, typename GridMap<T>::value_type value = GridMap<T>::DANGER, typename GridMap<T>::value_type default_value = GridMap<T>::UNKNOWN)
+  typename GridMask<T>::type* makeCircularMask(int radius,
+      typename GridMap<T>::value_type value = GridMap<T>::DANGER,
+      typename GridMap<T>::value_type default_value = GridMap<T>::UNKNOWN)
   {
     typedef typename GridMap<T>::value_type value_type;
 
@@ -247,7 +254,8 @@ namespace nav
   }
 
   template <typename T>
-  void inflateObstacles(GridMap<T>& map, int radius, typename GridMap<T>::value_type value = GridMap<T>::DANGER)
+  void inflateObstacles(GridMap<T>& map, int radius,
+      typename GridMap<T>::value_type value = GridMap<T>::DANGER)
   {
     CHECK_RADIUS(radius);
 
@@ -267,7 +275,8 @@ namespace nav
       return std::max(cell, mask_cell);
     };
 
-    typename GridCellSelectorFunction<value_type>::type pred = boost::bind(&GridMap<T>::isObstacle, map, _2);
+    typename GridCellSelectorFunction<value_type>::type pred =
+      boost::bind(&GridMap<T>::isObstacle, map, _2);
 
     apply_mask_if(map, *grid_mask, op, pred);
   }
@@ -288,7 +297,8 @@ namespace nav
       last_radius = radius;
     }
 
-    typename ApplyMaskOperator<T>::type op = [](value_type cell, value_type mask_cell)
+    typename ApplyMaskOperator<T>::type op =
+      [](value_type cell, value_type mask_cell)
     {
       // Mark the cell as known & free
       return 0;
@@ -297,7 +307,8 @@ namespace nav
   }
 
   template <typename T>
-  void inflateBlacklist(GridMap<T>& map, std::set<tf::Vector3> positions, int radius)
+  void inflateBlacklist(GridMap<T>& map,
+      std::set<tf::Vector3> positions, int radius)
   {
     CHECK_RADIUS(radius);
 
@@ -312,7 +323,8 @@ namespace nav
       last_radius = radius;
     }
 
-    typename ApplyMaskOperator<T>::type op = [](value_type cell, value_type mask_cell) -> value_type
+    typename ApplyMaskOperator<T>::type op =
+      [](value_type cell, value_type mask_cell) -> value_type
     {
       // If the cell isn't unknown, set it as unreachable.
       if (cell == GridMap<T>::UNKNOWN)
@@ -344,7 +356,8 @@ namespace nav
     }
 
     bool danger = false;
-    typename ApplyMaskOperator<T>::type op = [&danger](value_type cell, value_type mask_cell)
+    typename ApplyMaskOperator<T>::type op =
+      [&danger](value_type cell, value_type mask_cell)
     {
       if (mask_cell && cell > 0)
       {
@@ -358,7 +371,8 @@ namespace nav
   }
 
   template <typename T>
-  typename GridMask<T>::type* makeSquareMask(int radius, typename GridMap<T>::value_type value = GridMap<T>::DANGER)
+  typename GridMask<T>::type* makeSquareMask(int radius,
+      typename GridMap<T>::value_type value = GridMap<T>::DANGER)
   {
     typedef typename GridMap<T>::value_type value_type;
 

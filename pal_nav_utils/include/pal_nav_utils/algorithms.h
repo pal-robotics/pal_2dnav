@@ -112,7 +112,9 @@ namespace nav
   };
 
   template <typename T>
-  void apply_mask_at_idx(Grid<T>& map, const typename GridMask<T>::type& mask, typename ApplyMaskOperator<T>::type op, index_t idx)
+  void apply_mask_at_idx(Grid<T>& map,
+      const typename GridMask<T>::type& mask,
+      typename ApplyMaskOperator<T>::type op, index_t idx)
   {
     // Otherwise we can't calculate the center point
     ROS_ASSERT(mask.width % 2 == 1);
@@ -156,7 +158,10 @@ namespace nav
   }
 
   template <typename T>
-  void apply_mask_if(Grid<T>& map, const typename GridMask<T>::type& mask, typename ApplyMaskOperator<T>::type op, typename GridCellSelectorFunction<T>::type pred)
+  void apply_mask_if(Grid<T>& map,
+      const typename GridMask<T>::type& mask,
+      typename ApplyMaskOperator<T>::type op,
+      typename GridCellSelectorFunction<T>::type pred)
   {
     for (index_t idx = 0; idx < map.size(); ++idx)
     {
@@ -168,7 +173,9 @@ namespace nav
   }
 
   template <typename T>
-  typename Grid<T>::value_type MaskOperatorMax(typename Grid<T>::value_type cell, typename Grid<T>::value_type mask_cell)
+  typename Grid<T>::value_type MaskOperatorMax(
+      typename Grid<T>::value_type cell,
+      typename Grid<T>::value_type mask_cell)
   {
     return std::max(cell, mask_cell);
   }

@@ -73,14 +73,16 @@ namespace nav
     return marker_array_.markers.back();
   }
 
-  visualization_msgs::Marker& Markers::addMarker(const tf::Point& position, const tf::Quaternion& orientation)
+  visualization_msgs::Marker& Markers::addMarker(
+      const tf::Point& position, const tf::Quaternion& orientation)
   {
     visualization_msgs::Marker& marker = addMarker(position);
     tf::quaternionTFToMsg(orientation, marker.pose.orientation);
     return marker;
   }
 
-  visualization_msgs::Marker& Markers::addTextMarker(const std::string& text, const tf::Point& position)
+  visualization_msgs::Marker& Markers::addTextMarker(
+      const std::string& text, const tf::Point& position)
   {
     visualization_msgs::Marker& marker = addMarker(position);
     marker.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
@@ -115,7 +117,8 @@ namespace nav
     markers_.insert(make_pair(ns, Markers(publisher_, ns)));
   }
 
-  void MarkersCollection::addNamespace(const std::string& ns, float r, float g, float b)
+  void MarkersCollection::addNamespace(
+      const std::string& ns, float r, float g, float b)
   {
     Markers marker(publisher_, ns);
     marker.setDefaultColor(r, g, b, 1.0);
