@@ -32,7 +32,7 @@
 
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
-#include <pcl/ros/conversions.h>
+#include <pcl/conversions.h>
 
 #include <pal_nav_utils/grid_map.h>
 
