@@ -63,9 +63,9 @@ namespace nav
   public:
     typedef uint8_t value_type;
 
-    static constexpr value_type OBSTACLE    = 100;
-    static constexpr value_type DANGER      =  60;
-    static constexpr value_type UNREACHABLE =  50;
+    static constexpr value_type OBSTACLE    = 255;
+    static constexpr value_type DANGER      = 128;
+    static constexpr value_type UNREACHABLE = 100;
     static constexpr value_type UNKNOWN     =   0;
   };
 
