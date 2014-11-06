@@ -32,7 +32,9 @@ add_executable(exploration_server src/exploration_server.cpp)
 add_dependencies(exploration_server ${PROJECT_NAME}_gencfg ${PROJECT_NAME}_generate_messages_cpp)
 target_link_libraries(exploration_server ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${PROJECT_NAME})
 
-install(TARGETS exploration_server
+install(TARGETS ${PROJECT_NAME} exploration_server
+    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 foreach(dir launch)
