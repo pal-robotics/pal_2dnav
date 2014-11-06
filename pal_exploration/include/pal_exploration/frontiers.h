@@ -41,7 +41,7 @@ namespace exploration
   class FrontierCell
   {
   public:
-    FrontierCell(const nav::GridMap& map, nav::index_t idx)
+    FrontierCell(const nav::GridMap<int8_t>& map, nav::index_t idx)
       : idx(idx),
         x(idx % map.width),
         y(idx / map.width),
@@ -89,7 +89,7 @@ namespace exploration
     nav::index_t getCentroidFrontierCell() const;
 
     // Returns a reachable goal position.
-    nav::index_t getGoal(const nav::GridMap& map, const nav::DistanceMap& distmap) const;
+    nav::index_t getGoal(const nav::GridMap<int8_t>& map, const nav::DistanceMap& distmap) const;
 
     inline bool operator< (const Frontier& rhs) const
     {

@@ -104,7 +104,7 @@ namespace exploration
     bool finished_;
 
     std::vector<int8_t> original_map_;
-    std::unique_ptr<nav::GridMap> map_;
+    std::unique_ptr<nav::GridMap<int8_t>> map_;
     geometry_msgs::Pose pose_;
     bool pose_initialized_;
     bool map_ready_;

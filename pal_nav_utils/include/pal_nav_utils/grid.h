@@ -39,14 +39,17 @@ namespace nav
   typedef int32_t index_t;
   typedef std::vector<index_t> indices_t;
 
+  template <typename T>
   class Grid
   {
   public:
+    typedef T value_type;
+
     Grid(int width, int height)
       : data(width*height), width(width), height(height)
     {}
 
-    Grid(const std::vector<int8_t>& data, int width, int height)
+    Grid(const std::vector<value_type>& data, int width, int height)
       : data(data), width(width), height(height)
     {}
 
@@ -60,7 +63,7 @@ namespace nav
     /*
      * Same as data[getIdx(x, y)].
      */
-    inline index_t cell(int x, int y) const
+    inline value_type cell(int x, int y) const
     {
       return data[getIdx(x, y)];
     }
@@ -86,17 +89,55 @@ namespace nav
       return vec;
     }
 
-    indices_t getFourNeighbours(index_t idx) const;
+    indices_t getFourNeighbours(index_t idx) const
+    {
+      indices_t neighbours;
 
-    indices_t getEightNeighbours(index_t idx) const;
+      int x = idx % width;
+      int y = idx / width;
 
-    std::vector<int8_t> data;
+      if (x + 1 < width) neighbours.push_back(idx + 1);
+      if (x > 0) neighbours.push_back(idx - 1);
+
+      if (y + 1 < height) neighbours.push_back(idx + width);
+      if (y > 0) neighbours.push_back(idx - width);
+
+      return neighbours;
+    }
+
+    indices_t getEightNeighbours(index_t idx) const
+    {
+      indices_t neighbours = getFourNeighbours(idx);
+
+      int x = idx % width;
+      int y = idx / width;
+
+      if (y + 1 < height)
+      {
+        if (x + 1 < width) neighbours.push_back(idx + width + 1);
+        if (x > 0) neighbours.push_back(idx + width - 1);
+      }
+
+      if (y > 0)
+      {
+        if (x + 1 < width) neighbours.push_back(idx - width + 1);
+        if (x > 0) neighbours.push_back(idx - width - 1);
+      }
+
+      return neighbours;
+    }
+
+    std::vector<value_type> data;
     int width;
     int height;
   };
 
   // A mask/kernel to use for convolution, etc.
-  typedef Grid GridMask;
+  template <typename T>
+  struct GridMask
+  {
+    typedef Grid<T> type;
+  };
 
 }  // namespace nav
 }  // namespace pal

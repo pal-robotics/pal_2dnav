@@ -51,7 +51,7 @@ namespace exploration
     void preempt();
 
   protected:
-    std::vector<Frontier> findFrontiers(const nav::GridMap& map) const;
+    std::vector<Frontier> findFrontiers(const nav::GridMap<int8_t>& map) const;
 
     nav::DistanceStruct calculateDistances() const;
     FrontiersPriorityQueue calculateFrontiers(const nav::DistanceStruct& paths) const;

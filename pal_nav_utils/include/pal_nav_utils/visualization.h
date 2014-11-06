@@ -25,11 +25,16 @@
 
 #include <vector>
 #include <string>
+#include <algorithm>
 
 #include <geometry_msgs/PoseArray.h>
 #include <sensor_msgs/PointCloud2.h>
 
-#include "pal_nav_utils/grid_map.h"
+#include <pcl/point_types.h>
+#include <pcl/point_cloud.h>
+#include <pcl/conversions.h>
+
+#include <pal_nav_utils/grid_map.h>
 
 namespace pal
 {
@@ -37,12 +42,71 @@ namespace pal
 namespace nav
 {
 
-  nav_msgs::OccupancyGrid createOccupancyGrid(const GridMap& map);
+  template <typename T>
+  nav_msgs::OccupancyGrid createOccupancyGrid(const GridMap<T>& map)
+  {
+    nav_msgs::OccupancyGrid msg;
 
-  nav_msgs::OccupancyGrid createOccupancyGrid(const GridMap& map, const std::vector<int8_t>& cells);
+    msg.header.stamp = ros::Time::now();
+    msg.header.frame_id = "/map";
 
-  sensor_msgs::PointCloud2 createPointCloud(const GridMap& map, const std::vector<float>& cells, float height_scale=3.0);
-  sensor_msgs::PointCloud2 createPointCloud(const GridMap& map, const std::vector<int8_t>& cells, float height_scale=3.0);
+    msg.info.width = map.width;
+    msg.info.height = map.height;
+
+    msg.info.resolution = map.resolution;
+    msg.info.origin = map.origin;
+
+    msg.data = map.data;
+
+    return msg;
+  }
+
+  template <typename T>
+  nav_msgs::OccupancyGrid createOccupancyGrid(const GridMap<T>& map,
+      const std::vector<T>& cells)
+  {
+    GridMap<T> tmp(map);
+    tmp.data = cells;
+    return createOccupancyGrid(tmp);
+   }
+
+  template <typename T>
+  sensor_msgs::PointCloud2 createPointCloud(const GridMap<T>& map,
+      const std::vector<float>& cells,
+      float height_scale = 3.0)
+  {
+    pcl::PointCloud<pcl::PointXYZI> cloud;
+
+    cloud.width = map.width;
+    cloud.height = map.height;
+    cloud.points.resize(map.size());
+    float max_value = *std::max_element(cells.begin(), cells.end());
+    for (index_t idx = 0; idx < map.size(); ++idx)
+    {
+      cloud.points[idx].x = map.xToCoord(idx % map.width);
+      cloud.points[idx].y = map.yToCoord(idx / map.width);
+      cloud.points[idx].z = (std::fabs(max_value) > 1e-6) ?
+                            (cells[idx] / max_value) * height_scale : 0;
+      cloud.points[idx].intensity = cells[idx];
+    }
+
+    sensor_msgs::PointCloud2 cloud_msg;
+    pcl::toROSMsg(cloud, cloud_msg);
+
+    cloud_msg.header.stamp = ros::Time::now();
+    cloud_msg.header.frame_id = "map";
+
+    return cloud_msg;
+   }
+
+  template <typename T>
+  sensor_msgs::PointCloud2 createPointCloud(const GridMap<T>& map,
+      const std::vector<T>& cells,
+      float height_scale = 3.0)
+  {
+    std::vector<float> tmp(cells.begin(), cells.end());
+    return createPointCloud(map, tmp, height_scale);
+   }
 
   /*
    * Creates a PoseArray with arrows in each cell showing which paths
@@ -51,7 +115,35 @@ namespace nav
    * prevmap: After "index_t p = prevmap[idx];", p contains the index of
    *          the previous node for the path loading to idx.
    */
-  geometry_msgs::PoseArray createPoseArray(const GridMap& map, const std::vector<index_t>& prevmap);
+  template <typename T>
+  geometry_msgs::PoseArray createPoseArray(const GridMap<T>& map,
+      const std::vector<index_t>& prevmap)
+  {
+    geometry_msgs::PoseArray pose_array;
+
+    pose_array.header.stamp = ros::Time::now();
+    pose_array.header.frame_id = "map";
+
+    pose_array.poses.reserve(map.size());
+    for (index_t idx = 0; idx < map.size(); ++idx)
+    {
+      geometry_msgs::Pose pose;
+      pose.position.x = map.xToCoord(idx % map.width);
+      pose.position.y = map.yToCoord(idx / map.width);
+      for (index_t nidx : map.getEightNeighbours(idx))
+      {
+        if (prevmap[nidx] == idx)
+        {
+          tf::Vector3 vec = map.getGradient(idx, nidx);
+          double orientation = std::atan2(vec.y(), vec.x());
+          pose.orientation = tf::createQuaternionMsgFromYaw(orientation);
+          pose_array.poses.push_back(pose);
+        }
+      }
+    }
+
+    return pose_array;
+   }
 
   inline std::string intToHuman(int64_t number)
   {

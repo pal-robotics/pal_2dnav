@@ -214,7 +214,7 @@ namespace exploration
   DistanceStruct FrontiersStrategy::calculateDistances() const
   {
     index_t startIdx = map_->getIdxForPosition(pose_.position);
-    auto getEdges = boost::bind(&GridMap::getFourNeighbours, *map_, _1);
+    auto getEdges = boost::bind(&GridMap<int8_t>::getFourNeighbours, *map_, _1);
     const int sc = std::ceil(goal_edge_margin_ / map_->resolution);
     auto getCost = [&map_, &sc](index_t idx, index_t nidx) -> double
     {
@@ -305,7 +305,7 @@ namespace exploration
     return frontiers;
   }
 
-  std::vector<Frontier> FrontiersStrategy::findFrontiers(const GridMap& map) const
+  std::vector<Frontier> FrontiersStrategy::findFrontiers(const GridMap<int8_t>& map) const
   {
     static const int8_t kFrontier = 100;
     static const int8_t kDilated = 50;
@@ -316,7 +316,7 @@ namespace exploration
     int c = 0;
     for (index_t idx = 0; idx < map.size(); ++idx)
     {
-      bool is_frontier = map.data[idx] < GridMap::UNREACHABLE && map.isFrontier(idx);
+      bool is_frontier = map.data[idx] < GridMap<int8_t>::UNREACHABLE && map.isFrontier(idx);
       frontier_cells[idx] = (is_frontier) ? kFrontier : 0;
       if (is_frontier)
       {
